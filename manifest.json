@@ -1,0 +1,19 @@
+{
+  "manifest_version": 3,
+  "name": "Rabbit Holes",
+  "version": "1.0",
+  "description": "Tracks time spent on specific websites",
+  "permissions": ["storage"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"]
+    }
+  ],
+  "action": {
+    "default_popup": "companion.html"
+  }
+}
