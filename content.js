@@ -1,24 +1,8 @@
-const sites = {
-    "youtube.com": "youtube",
-    "twitch.tv": "twitch",
-    "instagram.com": "instagram",
-    "wikipedia.org": "wikipedia",
-    "wattpad.com": "wattpad",
-    "github.com": "github",
-    "linkedin.com": "linkedin",
-    "docs.google.com": "docs",
-    "mail.google.com": "email"
-};
+// content.js
+// Runs when loading
 
-function detectSite() {
-    const url = window.location.href;
+console.log("content.js loaded on", window.location.href);
 
-    for (const domain in sites) {
-        if (url.includes(domain)) {
-            return sites[domain];
-        }
-    }
-    return null;
-}
-
-chrome.runtime.sendMessage({ site: detectSite() });
+chrome.runtime.sendMessage({
+    url: window.location.href
+});

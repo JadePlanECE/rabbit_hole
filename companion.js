@@ -1,12 +1,7 @@
-function refresh() {
-    chrome.storage.local.get("counters", ({ counters }) => {
-        document.getElementById("stats").innerText =
-            JSON.stringify(counters, null, 2);
-    });
-}
+// companion.js
+// Runs only when companion.html is open
 
-document.getElementById("reset").onclick = () => {
-    chrome.storage.local.set({ counters: {} }, refresh);
-};
-
-refresh();
+chrome.storage.local.get("visited", ({ visited }) => {
+    document.getElementById("out").innerText =
+        JSON.stringify(visited, null, 2);
+});

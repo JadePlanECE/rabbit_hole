@@ -1,16 +1,12 @@
-let counters = {};
-
-chrome.runtime.onInstalled.addListener(() => {
-    counters = {};
-    chrome.storage.local.set({ counters });
-});
+// background.js
+// Runs in the background (seperate from pages), must receive message from content
 
 chrome.runtime.onMessage.addListener((msg) => {
-    if (msg.site) {
-        chrome.storage.local.get("counters", (data) => {
-            counters = data.counters || {};
-            counters[msg.site] = (counters[msg.site] || 0) + 1;
-            chrome.storage.local.set({ counters });
-        });
-    }
+    console.log("Background received:", msg.url);
+
+    chrome.storage.local.get("visited", (data) => {
+        const visited = data.visited || [];
+        visited.push(msg.url);
+        chrome.storage.local.set({ visited });
+    });
 });
