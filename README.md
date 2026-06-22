@@ -1,14 +1,15 @@
 # RABBIT HOLE
 
 ## Installation
-- Download the repository in your local computer
-- Go to the extension section in your browser
-- Go to 'manage your extension' and turn on developer mode
-- Locate the folder in your local machine where you downloaded the file and upload it to your browser
-- Turn on the extension and you are good to go!
+- Download the repository to your computer
+- Go to the 'Extensions' section of your browser
+- Enable developer mode (top right)
+- Click on 'Load unpacked extension'
+- Locate the folder on your computer and import it
+- Turn on the extension (if not enabled by default)
 
 ## Instructions
-Nothing to do, just chill. Check for the art later.
+Nothing to do, just chill. Check for the art and your stats later.
 
 ## Purpose
 The aim is to track the history of what you do on the Internet.
