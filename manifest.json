@@ -2,8 +2,7 @@
   "manifest_version": 3,
   "name": "Rabbit Holes",
   "version": "1.0.0",
-  "permissions": ["tabs", "storage", "alarms", "scripting"],
-  "host_permissions": ["<all_urls>"],
+  "permissions": ["tabs", "storage", "alarms"],
   "background": {
     "service_worker": "background.js"
   },
