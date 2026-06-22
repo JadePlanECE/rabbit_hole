@@ -194,7 +194,7 @@ function extractColorFromUrl(url, domain) {
             const color = extractDominantColor(img);
             resolve(color);
         };
-        img.onerror = () => resolve(hashDomainToHue(url));
+        img.onerror = () => resolve(hashDomainToHue(domain));
         img.src = url;
     });
 }
