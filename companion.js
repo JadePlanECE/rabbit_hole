@@ -4,8 +4,8 @@ const tableBody = document.querySelector("#table tbody");
 const logDiv = document.getElementById("log");
 const colorCache = new Map();
 let renderTimeout = null;
+let currentView = "today"; // today | week | all
 
-// Logging function
 function log(msg, obj) {
     const time = new Date().toLocaleTimeString();
     let line = `[${time}] ${msg}`;
@@ -18,20 +18,63 @@ function log(msg, obj) {
     logDiv.scrollTop = logDiv.scrollHeight;
 }
 
-// Throttled render
+function dateKeyLocal(ts) {
+    const d = new Date(ts);
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
+function lastNDayKeys(n) {
+    const keys = [];
+    for (let i = 0; i < n; i++) {
+        keys.push(dateKeyLocal(Date.now() - i * 24 * 60 * 60 * 1000));
+    }
+    return keys;
+}
+
+function sumDailyStats(dailyStats, dayKeys) {
+    const result = {};
+    for (const key of dayKeys) {
+        const dayData = dailyStats[key];
+        if (!dayData) continue;
+        for (const [domain, seconds] of Object.entries(dayData)) {
+            result[domain] = (result[domain] || 0) + seconds;
+        }
+    }
+    return result;
+}
+
+function computeStatsForView(view, timeSpent, dailyStats) {
+    if (view === "today") {
+        return sumDailyStats(dailyStats, [dateKeyLocal(Date.now())]);
+    }
+    if (view === "week") {
+        return sumDailyStats(dailyStats, lastNDayKeys(7));
+    }
+    // "all": legacy cumulative totals (everything before this update) plus
+    // every day ever recorded since.
+    const merged = { ...timeSpent };
+    const fromDaily = sumDailyStats(dailyStats, Object.keys(dailyStats));
+    for (const [domain, seconds] of Object.entries(fromDaily)) {
+        merged[domain] = (merged[domain] || 0) + seconds;
+    }
+    return merged;
+}
+
 function render() {
     if (renderTimeout) clearTimeout(renderTimeout);
 
     renderTimeout = setTimeout(async () => {
-        chrome.storage.local.get("timeSpent", async (data) => {
+        chrome.storage.local.get(["timeSpent", "dailyStats"], async (data) => {
             const timeSpent = data.timeSpent || {};
-            log("Rendering with data:", timeSpent);
+            const dailyStats = data.dailyStats || {};
+            const stats = computeStatsForView(currentView, timeSpent, dailyStats);
+            log(`[companion] Rendering view: ${currentView}`, stats);
 
             // Update table
-            updateTable(timeSpent);
+            updateTable(stats);
 
             // Update visualization
-            await updateArtVisualization(timeSpent);
+            await updateArtVisualization(stats);
         });
     }, 100);
 }
@@ -233,12 +276,9 @@ function hashDomainToHue(domain) {
 
 // Event listeners
 chrome.storage.onChanged.addListener((changes, area) => {
-    if (area === "local" && changes.timeSpent?.newValue) {
-        const newData = changes.timeSpent.newValue;
-        const oldData = changes.timeSpent.oldValue || {};
-        if (JSON.stringify(newData) !== JSON.stringify(oldData)) {
-            render();
-        }
+    if (area !== "local") return;
+    if (changes.dailyStats || changes.timeSpent) {
+        render();
     }
 });
 
@@ -246,6 +286,16 @@ document.getElementById("refresh").addEventListener("click", render);
 document.getElementById("reset").addEventListener("click", () => {
     log("Sending reset message");
     chrome.runtime.sendMessage({ type: "reset" }, () => {
+        render();
+    });
+});
+
+document.querySelectorAll(".view-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+        currentView = btn.dataset.view;
+        document.querySelectorAll(".view-btn").forEach((b) => {
+            b.classList.toggle("active", b === btn);
+        });
         render();
     });
 });

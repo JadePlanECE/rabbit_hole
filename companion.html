@@ -31,9 +31,24 @@
         color: #eee;
         border: none;
         cursor: pointer;
+        border-radius: 4px;
+        transition: background 0.2s;
       }
       button:hover {
         background: #666;
+      }
+      button.active {
+        background: #0066cc;
+        color: white;
+      }
+      .view-selector {
+        display: flex;
+        gap: 8px;
+        margin: 15px 0;
+        flex-wrap: wrap;
+      }
+      .view-selector button {
+        margin-top: 0;
       }
       #log {
         margin-top: 20px;
@@ -42,12 +57,20 @@
         background: #000;
         padding: 10px;
         border-radius: 4px;
+        max-height: 200px;
+        overflow-y: auto;
       }
     </style>
   </head>
   <body>
     <h1>Rabbit Hole</h1>
-    <p>Time is tracked every <strong>1 minute</strong> while a tab is active.</p>
+    <p>Time is tracked every active tab.</p>
+
+    <div class="view-selector">
+      <button class="view-btn active" data-view="today">Today</button>
+      <button class="view-btn" data-view="week">Last 7 Days</button>
+      <button class="view-btn" data-view="all">All Time</button>
+    </div>
 
     <h2>Art Time!</h2>
 
@@ -55,8 +78,10 @@
 
     <h2>Time spent on domains</h2>
 
-    <button id="reset">Reset</button>
-    <button id="refresh">Refresh</button>
+    <div style="display: flex; gap: 8px; margin-bottom: 15px; flex-wrap: wrap;">
+      <button id="reset">Reset</button>
+      <button id="refresh">Refresh</button>
+    </div>
 
     <table id="table">
       <thead>
